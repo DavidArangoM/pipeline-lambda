@@ -1,0 +1,36 @@
+# Use an official Node.js runtime as the base image
+FROM node:14
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the package.json and package-lock.json files to the container
+COPY package*.json ./
+
+# Install Node.js dependencies
+RUN npm install
+
+# Copy the rest of the application source code to the container
+COPY . .
+
+# Build the Node.js application (replace 'npm run build' with your actual build command)
+RUN npm run build
+
+# Install zip utility
+RUN apt-get update && apt-get install -y zip
+
+# Create a zip file from the build output
+RUN zip -r build.zip build
+
+# Create a volume where the build.zip file will be stored
+VOLUME /output
+
+# Copy the build.zip file to the volume
+CMD cp build.zip /output
+
+
+#--------------------
+# Build the Docker image (replace "my-node-app" with your desired image name)
+# docker build -t my-node-app .
+# Run the Docker container, and mount a volume to store build files
+# docker run -v my-node-app-build-volume:/app/build my-node-app

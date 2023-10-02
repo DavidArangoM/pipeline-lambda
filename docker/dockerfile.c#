@@ -1,0 +1,36 @@
+# Use the official .NET SDK image as the base image
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the project files (e.g., .csproj) to the container
+COPY MyCSharpApp.csproj .
+
+# Restore NuGet packages
+RUN dotnet restore
+
+# Copy the rest of the application code to the container
+COPY . .
+
+# Build the application and generate DLL files
+RUN dotnet publish -c Release -o out
+
+# Create a directory for the build artifacts and package them into a ZIP file
+RUN mkdir /build-artifacts && \
+    mv /app/out /build-artifacts && \
+    cd /build-artifacts && \
+    zip -r myapp.zip .
+
+# Create a volume to store the build artifacts
+VOLUME /output
+
+# Copy the ZIP file to the volume
+CMD ["cp", "/build-artifacts/myapp.zip", "/output/"]
+
+# #-------------------
+# # Build the Docker image
+# docker build -t my-csharp-compiler .
+
+# # Run the container, specifying a volume to store the build artifacts
+# docker run -v $(pwd)/output:/output my-csharp-compiler

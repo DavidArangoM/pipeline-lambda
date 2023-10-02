@@ -1,0 +1,5 @@
+* aws credentials, ask how to take them from the pipeline
+* Lambda role, check permissions
+* Lambda role, replicar permisos entre ambientes
+* identificar cuenta para hacer el asume role
+

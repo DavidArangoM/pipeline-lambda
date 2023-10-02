@@ -1,0 +1,40 @@
+development:
+  function:
+    accountId: "980952865757"
+    region: "us-west-2"
+    name: "itau-lambda-dev"
+    description: "Lambda para envio de notificaciones"
+    role: "arn:aws:iam::980952865757:role/itau-lambda-role"
+    timout: 900
+    memory-size: 128
+    storage-size: 512
+    vpc:
+      enabled: false
+      subnets: ["subnet-7c00c536", "subnet-306ab248"]
+      security-groups: ["sg-b62e8199"]
+    runtime:
+      runtime: "python3.8" #check this documentation: https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+      handler: "lambda_function.lambda_handler"
+      architecture: ["x86_64"]
+    layers: ["arn:aws:lambda:us-west-2:980952865757:layer:itau-lambda-layer:1"]
+    variables:
+      env: "dev"
+      dbUrl: "rds://"
+      folder: "x"
+    code:
+      zip:
+        enable: true
+        path:
+      docker:
+        enable: false
+  trigger_in:
+    policy:
+      statementId: "lambda-trigger"
+      accountId: "980952865757"
+      principal: "s3.amazonaws.com"
+      action: "lambda:InvokeFunction"
+      source-arn: "arn:aws:s3:::itau-bucket"
+    triggers:
+      trigger1: 
+      trigger2:
+  trigger_out:
