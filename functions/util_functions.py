@@ -25,16 +25,10 @@ def map_function_configuration_to_class(env_configuration):
 #Description: Map yaml fields to trigger in python class.
 def map_trigger_in_configuration_to_class(env_configuration):
     root_field = "trigger_in"
-    child_field = "policy"
-    policy = {
-        "statementId" : env_configuration[root_field][child_field]["statementId"],
-        "accountId" : env_configuration[root_field][child_field]["accountId"],
-        "principal" : env_configuration[root_field][child_field]["principal"],
-        "action" : env_configuration[root_field][child_field]["action"],
-        "sourceArn" : env_configuration[root_field][child_field]["source-arn"]
-    }
-    instance = TriggerInClass(policy)
-    return instance
+    child_field = "triggers"
+    triggers = env_configuration[root_field][child_field],
+    instance = TriggerInClass(triggers)
+    return instance 
 
 #Description: Map yaml fields to trigger out python class.
 def map_trigger_out_configuration_to_class(env_configuration):

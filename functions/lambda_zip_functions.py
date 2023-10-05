@@ -125,21 +125,16 @@ def check_if_lambda_exists(configuration_instance):
             return True
     return False
 
-#Description: Create all necessary trigger configuration
-def create_trigger_configuration(configuration_instance):
-    print('[itau-info] - creating lambda trigger')
-    
-    flag = check_if_function_policy_exists(configuration_instance)
-    if flag:
-        lambda_trigger_functions.s3_trigger_remove_permissions(configuration_instance)
-    lambda_trigger_functions.s3_trigger_add_permissions(configuration_instance)
-    print('[itau-info] - lambda trigger updated')
-
 #Description: Check if the lambda is being updated to wait for it.
 def check_if_lambda_is_being_updated(configuration_instance):
     print(f'[itau-info] - checking if "{configuration_instance.function_instance.name}" is being updated')
     lambda_client = util_functions.get_boto3_lambda_client(configuration_instance.function_instance.region)
-    response = lambda_client.get_function(FunctionName=configuration_instance.function_instance.name)
+    try:
+        response = lambda_client.get_function(FunctionName=configuration_instance.function_instance.name)
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'ResourceNotFoundException':
+            print("[itau-info] - lambda does not exists")
+            return
 
     if response['Configuration']['LastUpdateStatus'] == 'InProgress':
         print("[itau-info] - the Lambda function has an update in progress, waiting 15 seconds.")
@@ -147,8 +142,8 @@ def check_if_lambda_is_being_updated(configuration_instance):
         check_if_lambda_is_being_updated(configuration_instance)
 
 #Description: Check there is a policy for the function.
-def check_if_function_policy_exists(configuration_instance):
-    print('[itau-info] - checking if function policy exists')
+def check_if_function_policy_exists(configuration_instance, statementId):
+    print('[itau-info] - checking if function policy exists for trigger')
 
     lambda_client = util_functions.get_boto3_lambda_client(configuration_instance.function_instance.region)
     try:
@@ -166,9 +161,35 @@ def check_if_function_policy_exists(configuration_instance):
     # print(policy['Statement'])
     statement_list = policy['Statement']
     for statement in  statement_list:
-        if configuration_instance.trigger_in_instance.policy["statementId"] == str(statement['Sid']):
-            print("[itau-info] - Policy found")
+        #cambiar acá
+        if statementId == str(statement['Sid']):
+            print("[itau-info] - Policy for trigger found")
             return True
     
-    print("[itau-info] - Policy not found")
+    print("[itau-info] - Policy for trigger not found")
     return False
+
+#Description: Create all necessary trigger configuration
+def create_trigger_configuration(configuration_instance):
+    print('[itau-info] - creating/updating lambda trigger')
+
+    #get all triggers_in
+    triggers = configuration_instance.trigger_in_instance.triggers[0]
+
+    #Validate if there is a existing policy
+    for trigger in triggers:
+        trigger_in_policy =  triggers[trigger]['policy']
+        flag = check_if_function_policy_exists(configuration_instance, trigger_in_policy['statementId'])
+        if flag:
+           lambda_trigger_functions.lambda_trigger_remove_permissions(configuration_instance, trigger_in_policy)
+        lambda_trigger_functions.lambda_trigger_add_permissions(configuration_instance, trigger_in_policy)
+        #lambda_trigger_functions.lambda_trigger_check_event_source_mapping(configuration_instance)   
+        lambda_trigger_functions.lambda_trigger_add_event_source_mapping(configuration_instance, triggers[trigger]) 
+    
+    
+    print('[itau-info] - lambda trigger created/updated')
+
+#Description: Build Lambda arn
+def build_lambda_arn(configuration_instance):
+    arn = 'arn:aws:lambda:' + configuration_instance.function_instance.region + ':' + configuration_instance.function_instance.accountId + ':function:' + configuration_instance.function_instance.name
+    return arn

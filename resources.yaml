@@ -28,13 +28,35 @@ development:
       docker:
         enable: false
   trigger_in:
-    policy:
-      statementId: "lambda-trigger"
-      accountId: "980952865757"
-      principal: "s3.amazonaws.com"
-      action: "lambda:InvokeFunction"
-      source-arn: "arn:aws:s3:::itau-bucket"
     triggers:
-      trigger1: 
+      trigger1:
+        type: "s3"
+        functionName: "itau-lambda-dev"
+        bucketName: "itau-bucket"
+        events:
+          - "s3:ObjectCreated:*"
+        filters:
+          prefix: "ListaCorreos"
+          suffix: ""
+        policy:
+          statementId: "trigger1-policy"
+          accountId: "980952865757"
+          principal: "s3.amazonaws.com"
+          action: "lambda:InvokeFunction"
+          sourceArn: "arn:aws:s3:::itau-bucket"
       trigger2:
+        type: "s3"
+        functionName: "itau-lambda-dev"
+        bucketName: "itau-bucket-1"
+        events:
+          - "s3:ObjectCreated:*"
+        filters:
+          prefix: ""
+          suffix: "ListaCorreos"
+        policy:
+          statementId: "trigger2-policy"
+          accountId: "980952865757"
+          principal: "s3.amazonaws.com"
+          action: "lambda:InvokeFunction"
+          sourceArn: "arn:aws:s3:::itau-bucket-1"
   trigger_out:

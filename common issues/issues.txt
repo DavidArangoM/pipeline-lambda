@@ -2,4 +2,5 @@
 * Lambda role, check permissions
 * Lambda role, replicar permisos entre ambientes
 * identificar cuenta para hacer el asume role
+* triggers: Unrecognized event source, must be kinesis, dynamodb stream or sqs. Unsupported source arn : arn:aws:s3:::itau-bucket
 

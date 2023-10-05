@@ -1,1 +1,35 @@
-Test docker file to compile code
+Pasos a realizar
+	*Creación y/o actualización
+		* General config
+		* Triggers 
+		* Permissions
+		* Destinations
+		* Environment variables
+		* Tags
+		* VPC	
+		* Layers (crear y asociar
+	*Construir imagen / 
+	*Generar zip file
+	*Asignar permisos al trigger
+	*Asociación de trigger (entrada-salida)
+	*Crear rol del lambda, con los permisos necesarios
+
+
+NOTA:
+	* Para los triggers, como son muhcas posibilidades se dejará generico y que acepte cualquier parametro
+	* Para los triggers, crear lista donde se especifique los soportados.
+	* Para los triggers, hacer casos de uso y documentarlos
+	* Los recursos externos deberían estar creados y con permisos para que el usuario del lambda los asocie(load balancers, buckets)
+	* Si un permiso es cambiado en el yaml, el anterior no será removido ya que el nombre cambia
+
+
+TO-DO
+Pre-requisitos - source y targets creados
+	- ALB
+	- S3
+	- DYNAMO
+	- Event bridge
+	- Letter queu??
+	
+	
+NOTA: Averiguar si devolverse a una version tambien cambia la configuración del trigger 

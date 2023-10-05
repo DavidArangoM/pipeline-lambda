@@ -4,13 +4,7 @@ import boto3
 lambda_client = boto3.client('lambda')
 
 # Define your JSON object with the desired event source mapping configuration
-event_source_mapping_config = {
-    "FunctionName": "your-lambda-function-name",
-    "EventSourceArn": "your-event-source-arn",
-    "Enabled": True,  # Set to True to enable the event source mapping
-    "BatchSize": 10,  # Set your desired batch size
-    "StartingPosition": "TRIM_HORIZON"  # Set your desired starting position
-}
+event_source_mapping_config = {"FunctionName": "itau-lambda-dev", "EventSourceArn": "arn:aws:s3:::itau-bucket", "Enabled": True, "BatchSize": 10, "EventSource": "aws:s3"}
 
 try:
     # Create the event source mapping using the JSON configuration

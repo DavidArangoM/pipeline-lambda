@@ -1,5 +1,5 @@
 class TriggerInClass:
-    def __init__(self, policy) -> None:
-         self.policy = policy
+    def __init__(self, triggers) -> None:
+         self.triggers = triggers
         
         
