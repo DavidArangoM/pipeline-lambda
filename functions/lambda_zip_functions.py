@@ -5,6 +5,7 @@ import json
 from classes.function_class import FunctionClass
 from functions import util_functions
 from functions import lambda_trigger_functions
+from config import config
 
 #Description: Take the configuration from the yaml file and create aws lambda.
 def create_lambda(configuration_instance):
@@ -169,9 +170,9 @@ def check_if_function_policy_exists(configuration_instance, statementId):
     print("[itau-info] - Policy for trigger not found")
     return False
 
-#Description: Create all necessary trigger configuration
-def create_trigger_configuration(configuration_instance):
-    print('[itau-info] - creating/updating lambda trigger')
+#Description: Create all necessary in-trigger configuration
+def create_trigger_in_configuration(configuration_instance):
+    print('[itau-info] - creating/updating lambda in-trigger')
 
     #get all triggers_in
     triggers = configuration_instance.trigger_in_instance.triggers[0]
@@ -187,7 +188,54 @@ def create_trigger_configuration(configuration_instance):
         lambda_trigger_functions.lambda_trigger_add_event_source_mapping(configuration_instance, triggers[trigger]) 
     
     
-    print('[itau-info] - lambda trigger created/updated')
+    print('[itau-info] - lambda in-trigger created/updated')
+
+#Description: Create all necessary out-trigger configuration
+def create_trigger_out_configuration(configuration_instance):
+    print('[itau-info] - creating/updating lambda out-trigger')
+
+    #get all triggers_out
+    triggers = configuration_instance.trigger_out_instance.triggers[0]
+
+    #get lambda client
+    lambda_client = util_functions.get_boto3_lambda_client(configuration_instance.function_instance.region)
+
+    #Validate if there is a existing policy
+    for trigger in triggers:
+        on_success = triggers[trigger]["onSuccess"]
+        on_failure = triggers[trigger]["onFailure"]
+        if len(on_success) == 0 or len(on_failure) == 0:
+            print('[itau-error] - onSuccess and onFailure can not be empty')
+            exit()
+        
+        trigger_out_types = config.configuration["trigger_out_types"]
+        
+        if not util_functions.is_a_valid_arn(on_success, trigger_out_types):
+            print(f'[itau-error] - onSuccess arn is related to a service dont allowed')
+            exit()
+        
+        if not util_functions.is_a_valid_arn(on_failure, trigger_out_types):
+            print(f'[itau-error] - onFailure arn is related to a service dont allowed')
+            exit()
+        
+        response = lambda_client.put_function_event_invoke_config(
+            FunctionName=configuration_instance.function_instance.name,
+            MaximumRetryAttempts= triggers[trigger]["MaximumRetryAttempts"],
+            DestinationConfig={
+                'OnSuccess': {
+                    'Destination': on_success
+                },
+                'OnFailure': {
+                    'Destination': on_failure
+                }
+            }
+        )
+
+        if response['ResponseMetadata']['HTTPStatusCode'] != 200:
+            print('[itau-error] - lambda code could not be updated: '+str(response))
+            exit()
+    
+    print('[itau-info] - lambda out-trigger created/updated')
 
 #Description: Build Lambda arn
 def build_lambda_arn(configuration_instance):

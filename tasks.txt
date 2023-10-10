@@ -30,6 +30,14 @@ Pre-requisitos - source y targets creados
 	- DYNAMO
 	- Event bridge
 	- Letter queu??
+
+Trigger de salida
+	El execution rol (lambda) debe tener los siguientes permisos
+    Amazon SQS – sqs:SendMessage
+    Amazon SNS – sns:Publish
+    Lambda – InvokeFunction
+    EventBridge – events:PutEvents
+
 	
 	
 NOTA: Averiguar si devolverse a una version tambien cambia la configuración del trigger 

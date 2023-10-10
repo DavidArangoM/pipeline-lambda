@@ -2,25 +2,29 @@ development:
   function:
     accountId: "980952865757"
     region: "us-west-2"
-    name: "itau-lambda-dev"
+    name: "cash-management-bcl-sendemailses-dev"
     description: "Lambda para envio de notificaciones"
     role: "arn:aws:iam::980952865757:role/itau-lambda-role"
-    timout: 900
-    memory-size: 128
+    timout: 800
+    memory-size: 300
     storage-size: 512
     vpc:
       enabled: false
       subnets: ["subnet-7c00c536", "subnet-306ab248"]
       security-groups: ["sg-b62e8199"]
     runtime:
-      runtime: "python3.8" #check this documentation: https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
-      handler: "lambda_function.lambda_handler"
+      runtime: "dotnet6" #check this documentation: https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+      handler: "AWSLambda.Collection.SendEmailSES::AWSLambda.Collection.SendEmailSES.Function::FunctionHandler"
       architecture: ["x86_64"]
     layers: ["arn:aws:lambda:us-west-2:980952865757:layer:itau-lambda-layer:1"]
     variables:
-      env: "dev"
-      dbUrl: "rds://"
-      folder: "x"
+      SendEmailSESEndpoint: "http://notification-1572.bcl-dev-ms.clouditauchile.cl/"
+      BucketS3: "itau-bucket"
+      WebAPI: "SendEmailSES"
+      Folder: "Adjunto"
+      FolderLog: "ResultLog"
+      FolderEmail: "Listacorreos"
+      FolderBase: "cash"
     code:
       zip:
         enable: true
@@ -34,9 +38,9 @@ development:
         functionName: "itau-lambda-dev"
         bucketName: "itau-bucket"
         events:
-          - "s3:ObjectCreated:*"
+          - "s3:ObjectCreated:Put"
         filters:
-          prefix: "ListaCorreos"
+          prefix: "cash/Listacorreos/"
           suffix: ""
         policy:
           statementId: "trigger1-policy"
@@ -60,10 +64,3 @@ development:
           action: "lambda:InvokeFunction"
           sourceArn: "arn:aws:s3:::itau-bucket-1"
   trigger_out:
-    triggers:
-      trigger1:
-        type: "Lambda"
-        onSuccess: "arn:aws:lambda:us-west-2:980952865757:function:itau-lambda"
-        onFailure: "arn:aws:lambda:us-west-2:980952865757:function:itau-lambda"
-        MaximumRetryAttempts: 1
-        functionName: "itau-lambda-dev"

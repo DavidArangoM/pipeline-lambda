@@ -1,4 +1,5 @@
 import boto3
+import re
 from classes.function_class import FunctionClass
 from classes.trigger_in_class import TriggerInClass
 from classes.trigger_out_class import TriggerOutClass
@@ -32,8 +33,10 @@ def map_trigger_in_configuration_to_class(env_configuration):
 
 #Description: Map yaml fields to trigger out python class.
 def map_trigger_out_configuration_to_class(env_configuration):
-    root_field = "trigger_in"
-    instance = TriggerOutClass()
+    root_field = "trigger_out"
+    child_field = "triggers"
+    triggers = env_configuration[root_field][child_field],
+    instance = TriggerOutClass(triggers)
     return instance
 
 #Description: Map yaml fields to configuration python class.
@@ -50,3 +53,13 @@ def get_boto3_lambda_client(region):
 def get_boto3_s3_client(region):
     s3_client = boto3.client('s3', region_name=region)
     return s3_client
+
+def is_a_valid_arn(arn, arn_list):
+    
+    for service, pattern in arn_list.items():
+        # print("service "+ str(service))
+        # print("arn: "+ str(arn))
+        # print("pattern: "+ str(pattern))
+        if re.match(pattern, arn):
+            return True
+    return False
