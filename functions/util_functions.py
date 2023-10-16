@@ -3,7 +3,9 @@ import re
 from classes.function_class import FunctionClass
 from classes.trigger_in_class import TriggerInClass
 from classes.trigger_out_class import TriggerOutClass
+from classes.iam_role_class import IamRoleClass
 from classes.configuration_class import ConfigurationClass
+
 
 #Description: Map yaml fields to function python class.
 def map_function_configuration_to_class(env_configuration):
@@ -40,8 +42,8 @@ def map_trigger_out_configuration_to_class(env_configuration):
     return instance
 
 #Description: Map yaml fields to configuration python class.
-def map_all_configuration_to_class( function_instance, trigger_in_instance, trigger_out_instance):
-    instance = ConfigurationClass(function_instance, trigger_in_instance, trigger_out_instance)
+def map_all_configuration_to_class( function_instance, trigger_in_instance, trigger_out_instance, role_instance):
+    instance = ConfigurationClass(function_instance, trigger_in_instance, trigger_out_instance, role_instance)
     return instance
 
 #Description: Return boto3 lambda client to avoid boilerplate code.
@@ -54,6 +56,12 @@ def get_boto3_s3_client(region):
     s3_client = boto3.client('s3', region_name=region)
     return s3_client
 
+#Description: Return boto3 s3 client to avoid boilerplate code.
+def get_boto3_iam_client(region):
+    s3_client = boto3.client('iam', region_name=region)
+    return s3_client
+
+#Description: Check if the arn is an valid arn based on a pattern
 def is_a_valid_arn(arn, arn_list):
     
     for service, pattern in arn_list.items():

@@ -32,7 +32,7 @@ Pre-requisitos - source y targets creados
 	- Letter queu??
 
 Trigger de salida
-	El execution rol (lambda) debe tener los siguientes permisos
+	El execution rol (lambda) debe tener los siguientes permisos - agregar manual o automatico
     Amazon SQS – sqs:SendMessage
     Amazon SNS – sns:Publish
     Lambda – InvokeFunction

@@ -5,6 +5,7 @@ import json
 from classes.function_class import FunctionClass
 from functions import util_functions
 from functions import lambda_trigger_functions
+from functions import iam_functions
 from config import config
 
 #Description: Take the configuration from the yaml file and create aws lambda.
@@ -23,7 +24,7 @@ def create_lambda(configuration_instance):
         Description=configuration_instance.function_instance.description,
         Runtime=configuration_instance.function_instance.runtime['runtime'],
         Handler=configuration_instance.function_instance.runtime['handler'],
-        Role=configuration_instance.function_instance.role,        
+        Role= iam_functions.build_iam_arn(configuration_instance.function_instance.accountId, configuration_instance.function_instance.role['name'], 'role'),      
         Timeout=configuration_instance.function_instance.timeout,
         MemorySize= configuration_instance.function_instance.memory_size,
         PackageType='Zip',
@@ -60,7 +61,7 @@ def update_lambda_configuration(configuration_instance):
     response = lambda_client.update_function_configuration(
         FunctionName=configuration_instance.function_instance.name,
         Description=configuration_instance.function_instance.description,
-        Role=configuration_instance.function_instance.role,
+        Role=iam_functions.build_iam_arn(configuration_instance.function_instance.accountId, configuration_instance.function_instance.role['name'], 'role'),
         Handler=configuration_instance.function_instance.runtime['handler'],
         Runtime=configuration_instance.function_instance.runtime['runtime'],        
         Timeout=configuration_instance.function_instance.timeout,

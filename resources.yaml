@@ -4,7 +4,10 @@ development:
     region: "us-west-2"
     name: "itau-lambda-dev"
     description: "Lambda para envio de notificaciones"
-    role: "arn:aws:iam::980952865757:role/itau-lambda-role"
+    role:
+      name: "itau-lambda-role"
+      assumeRolePolicyName: "lambda_assume_role_policy"
+      customPolicyName: "lambda_role_custom_policy"
     timout: 900
     memory-size: 128
     storage-size: 512
