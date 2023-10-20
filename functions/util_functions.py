@@ -42,8 +42,8 @@ def map_trigger_out_configuration_to_class(env_configuration):
     return instance
 
 #Description: Map yaml fields to configuration python class.
-def map_all_configuration_to_class( function_instance, trigger_in_instance, trigger_out_instance, role_instance):
-    instance = ConfigurationClass(function_instance, trigger_in_instance, trigger_out_instance, role_instance)
+def map_all_configuration_to_class( function_instance, trigger_in_instance, trigger_out_instance):
+    instance = ConfigurationClass(function_instance, trigger_in_instance, trigger_out_instance)
     return instance
 
 #Description: Return boto3 lambda client to avoid boilerplate code.

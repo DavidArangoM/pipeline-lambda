@@ -12,7 +12,7 @@ def clone(repo_name, branch_tag):
     print('[itau-info] - branch or tag to be checkout: '+branch_tag)
 
     if os.path.exists(repo_name):
-        print(f'[itau-info] - folder {repo_name} exists, removing it')
+        print(f'[itau-info] - folder/repository {repo_name} exists, removing it')
         try:
             shutil.rmtree(repo_name)
         except OSError as e:
@@ -23,12 +23,14 @@ def clone(repo_name, branch_tag):
         subprocess.run(['git', 'clone', repo_url])
         print('[itau-info] - repository cloned!')
     except Exception as e:
-        print('[itau-error] -repository could not be cloned: '+str(e))
+        print('[itau-error] - repository could not be cloned: '+str(e))
 
     try:
         #Checkout to branch or tag
-        subprocess.call('cd '+ repo_name, shell=True)
+        original_directory = os.getcwd()
+        os.chdir(repo_name)
         os.system('git checkout '+branch_tag)
+        os.chdir(original_directory)
         print('[itau-info] - checkout done to specific branch or tag!')
     except Exception as e:
         print('[itau-error] - checkout could not be done: '+str(e))

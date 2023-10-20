@@ -27,7 +27,7 @@ development:
     code:
       zip:
         enable: true
-        path:
+        path: "deploy/lambda.zip"
       docker:
         enable: false
   trigger_in:

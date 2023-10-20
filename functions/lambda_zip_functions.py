@@ -7,6 +7,7 @@ from functions import util_functions
 from functions import lambda_trigger_functions
 from functions import iam_functions
 from config import config
+import os
 
 #Description: Take the configuration from the yaml file and create aws lambda.
 def create_lambda(configuration_instance):
@@ -91,7 +92,7 @@ def update_lambda_code(configuration_instance):
     check_if_lambda_is_being_updated(configuration_instance)
 
     # Read the ZIP file as binary data
-    zip_file_path = f'./{configuration_instance.function_instance.name}.zip'
+    zip_file_path = f'./{configuration_instance.function_instance.code["zip"]["path"]}'
     code_zip = ''
     with open(zip_file_path, 'rb') as zip_file:
         code_zip = zip_file.read()
@@ -133,15 +134,16 @@ def check_if_lambda_is_being_updated(configuration_instance):
     lambda_client = util_functions.get_boto3_lambda_client(configuration_instance.function_instance.region)
     try:
         response = lambda_client.get_function(FunctionName=configuration_instance.function_instance.name)
+
+        if response['Configuration']['LastUpdateStatus'] == 'InProgress':
+            print("[itau-info] - the Lambda function has an update in progress, waiting 15 seconds.")
+            time.sleep(15)
+            check_if_lambda_is_being_updated(configuration_instance)
+    
     except ClientError as e:
         if e.response['Error']['Code'] == 'ResourceNotFoundException':
             print("[itau-info] - lambda does not exists")
             return
-
-    if response['Configuration']['LastUpdateStatus'] == 'InProgress':
-        print("[itau-info] - the Lambda function has an update in progress, waiting 15 seconds.")
-        time.sleep(15)
-        check_if_lambda_is_being_updated(configuration_instance)
 
 #Description: Check there is a policy for the function.
 def check_if_function_policy_exists(configuration_instance, statementId):
